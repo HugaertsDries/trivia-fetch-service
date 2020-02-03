@@ -13,11 +13,10 @@ export class TriviaStore {
 
     // DONE
     async addTrivia(trivia) {
-        let triviaId = uuidv5(trivia.trivia, NAMESPACE);
+        let triviaId = uuidv5(trivia.question, NAMESPACE);
         let categoryId = uuidv5(trivia.category, NAMESPACE);
 
         let q = `
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX vet: <${PREFIX_PRE_EXT_TRIVIA}>
         PREFIX vtc: <${PREFIX_PRE_EXT_TRIVIA}/category>
         PREFIX vc:  <${PREFIX_PRE_CORE}>
@@ -25,17 +24,17 @@ export class TriviaStore {
         INSERT DATA {
             GRAPH <http://mu.semte.ch/application> { 
                 <${PREFIX_TRIVIAS}${triviaId}> 
-                    rdf:type vet:Trivia ; 
+                    a vet:Trivia ; 
                     vc:uuid "${triviaId}" ;
                     vet:category <${PREFIX_Q_CATEGORIES}${triviaId}> ;
                     vet:type "${trivia.type}" ;
                     vet:difficulty "${trivia.difficulty}" ;
-                    vet:trivia "${trivia.trivia}" ;
+                    vet:question "${trivia.question}" ;
                     vet:correct_answer "${trivia.correct_answer}" ;
                     ${(trivia.incorrect_answers.map((answer) => `vet:incorrect_answer "${answer}"`).join(" ; ") + " .")}
 
-                <${PREFIX_Q_CATEGORIES}${triviaId}>
-                    rdf:type vtc:Category ;
+                <${PREFIX_Q_CATEGORIES}${categoryId}>
+                    a vtc:Category ;
                     vc:uuid "${categoryId}" ;
                     vtc:name "${trivia.category}" .
             }
@@ -45,35 +44,24 @@ export class TriviaStore {
         return triviaId;
     }
 
-    addTrivias(trivias) {
-        trivias.forEach(trivia => {
-            this.addTrivia(trivia);
-        });
+    async addTrivias(trivias) {
+        for(let trivia of trivias ) {
+            await this.addTrivia(trivia);
+        }
     }
 
     // TODO add params {type, category, difficulty, ...}
-    async getAmountTrivias(params) {
-        const { type, category, difficulty } = params
+    async getTriviaCount(params) {
         let q = `
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX vet: <${PREFIX_PRE_EXT_TRIVIA}>
-        PREFIX vc: <${PREFIX_PRE_CORE}>
         
-        SELECT COUNT(?uri) AS ?count
+        SELECT COUNT(?s) AS ?count
         WHERE {
-            GRAPH <http://mu.semte.ch/application> {
-                ?uri rdf:type vet:Trivia .
-                ?uri vet:category ?curi .
-                ?curi vc:uuid ?cid .
-                ?uri vet:type ?type .
-                ?uri vet:difficulty ?difficulty .
-                ${type ? `FILTER(?type = "${type}") .` : ""}
-                ${difficulty ? `FILTER(?difficulty = "${difficulty}") .` : ""}
-                ${category ? `FILTER(?cid = "${category}")` : ""} 
-            }
+          ?s a vet:Trivia
         }
         `
         let res = await query(q);
+        console.log(res);
         return res.results.bindings[0].count.value;
     }
 }
