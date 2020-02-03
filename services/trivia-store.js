@@ -61,7 +61,6 @@ export class TriviaStore {
         }
         `
         let res = await query(q);
-        console.log(res);
         return res.results.bindings[0].count.value;
     }
 }
