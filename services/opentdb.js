@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 const HOST = "https://opentdb.com/";
 const TRIVIA_ENDPOINT = "api.php";
 const CATEGORIES_ENDPOINT = "api_category.php";
+const COUNT_ENDPOINT = "api_count_global.php";
 
 const DEFAULT_QUERY = {
     amount: 50,
@@ -34,5 +35,10 @@ export class OpenTDBService {
         let response = await fetch(`${HOST}${CATEGORIES_ENDPOINT}`)
             .then((response) => response.json());
         return response.trivia_categories;
+    }
+
+    async getCount() {
+        let response = await fetch(`${HOST}${COUNT_ENDPOINT}`).then(response => response.json());
+        return response.overall.total_num_of_pending_questions;
     }
 }
