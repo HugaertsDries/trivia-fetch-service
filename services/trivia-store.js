@@ -50,8 +50,8 @@ export class TriviaStore {
         }
     }
 
-    // TODO add params {type, category, difficulty, ...}
-    async getTriviaCount(params) {
+    // DONE
+    async getCount() {
         let q = `
         PREFIX vet: <${PREFIX_PRE_EXT_TRIVIA}>
         
@@ -62,5 +62,18 @@ export class TriviaStore {
         `
         let res = await query(q);
         return res.results.bindings[0].count.value;
+    }
+
+    // TODO clear the db
+    async clearDB() {
+        let q = `
+        DELETE
+        WHERE {
+            GRAPH <http://mu.semte.ch/application> { 
+                ?s ?p ?o
+            }
+        }
+        `
+        await query(q);
     }
 }
