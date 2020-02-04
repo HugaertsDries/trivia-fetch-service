@@ -1,13 +1,17 @@
 {
-  "name": "trivia-cron-service",
+  "name": "trivia-fetch-service",
   "version": "1.0.0",
-  "description": "microservice that will run cron jobs",
+  "description": "Mircroservices responsible for fetching trivia from the openTDB.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Dries Hugaerts",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HugaertsDries/trivia-fetch-service.git"
+  },
   "dependencies": {
     "cron": "^1.8.2",
     "node-fetch": "^2.6.0",
